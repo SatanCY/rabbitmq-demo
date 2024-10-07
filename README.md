@@ -58,11 +58,25 @@ RabbitMQ是由erlang语言开发，基于AMQP（Advanced Message Queue 高级消
 RabbitMQ提供了6种模式：简单模式，work模式，Publish/Subscribe发布与订阅模式，Routing路由模式，Topics 主题模式，RPC远程调用模式（远程调用，不太算MQ；不作介绍）；
 
 > 官网对应模式介绍：https://www.rabbitmq.com/getstarted.html
-
+---
 #### 简单模式
+
+![img_1.png](img_1.png)
 
 生产者发送消息到队列中，一个消费者从队列中接收消息
 
 > 在RabbitMQ中消费者只能从队列接收消息
 >
 > 如果在同一个队列中接收消息的消费者有多个时，如何分配消息?
+---
+#### 工作队列模式
+
+![img.png](img.png)
+
+生产者发送消息到队列中，多个消费者从队列中接收消息，消费者之间是竞争关系
+
+>一个消息只能被一个消费者接收，其他消费者是不能接收到同一条消息的
+> 
+> 可以在消费者端处理任务比较耗时的时候，添加对同一队列的消费者来提高任务处理能力
+
+
