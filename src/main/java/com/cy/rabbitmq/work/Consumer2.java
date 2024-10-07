@@ -39,7 +39,7 @@ public class Consumer2 {
                     //路由key
                     System.out.println("路由key为："+envelope.getRoutingKey());
                     //交换机
-                    System.out.println("交换机为："+envelope.getRoutingKey());
+                    System.out.println("交换机为："+envelope.getExchange());
                     //消息id
                     System.out.println("消息id为："+envelope.getDeliveryTag());
                     //接收到的消息

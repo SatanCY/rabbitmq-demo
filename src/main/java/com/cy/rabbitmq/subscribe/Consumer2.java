@@ -1,4 +1,4 @@
-package com.cy.rabbitmq.work;
+package com.cy.rabbitmq.subscribe;
 
 import com.cy.rabbitmq.utils.RabbitUtils;
 import com.rabbitmq.client.*;
@@ -6,20 +6,22 @@ import com.rabbitmq.client.*;
 import java.io.IOException;
 
 /**
- * 消费者1
+ * 消费者2
  *
  * @Author：SatanCY
  * @Date：2024/9/27 17:49
  */
-public class Consumer1 {
-    private final static String QUEUE_NAME = "work_queue";
+public class Consumer2 {
+    private final static String FANOUT_QUEUE_2 = "fanout_queue_2";
+    private static final String FANOUT_EXCHANGE = "fanout_exchange";
 
     public static void main(String[] argv) throws Exception {
-        //1.创建连接工厂（设置RabbitMQ的连接参数）
-        //2.创建链接
+        //1.创建链接
         Connection connection = RabbitUtils.getConnection();
-        //3.创建频道
+        //2.创建频道
         Channel channel = connection.createChannel();
+        //3.声明交换机
+        channel.exchangeDeclare(FANOUT_EXCHANGE,BuiltinExchangeType.FANOUT);
         //4.声明队列
         /**
          * 参数1：队列名称
@@ -28,9 +30,11 @@ public class Consumer1 {
          * 参数4：是否在不使用的时候自动删除队列
          * 参数5：其他参数
          */
-        channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+        channel.queueDeclare(FANOUT_QUEUE_2, true, false, false, null);
+        //5.绑定队列
+        channel.queueBind(FANOUT_QUEUE_2,FANOUT_EXCHANGE,"");
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-        //5.创建消费者
+        //6.创建消费者
         DefaultConsumer defaultConsumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
@@ -42,7 +46,7 @@ public class Consumer1 {
                     //消息id
                     System.out.println("消息id为："+envelope.getDeliveryTag());
                     //接收到的消息
-                    System.out.println("消费者1======接收到的消息为："+new String(body,"UTF-8"));
+                    System.out.println("消费者2======接收到的消息为："+new String(body,"UTF-8"));
 
                     Thread.sleep(1000);
 
@@ -57,12 +61,12 @@ public class Consumer1 {
                 }
             }
         };
-        //6.监听队列
+        //7.监听队列
         /**
          * 参数1：队列名
          * 参数2：是否自动确认，设置为true时自动向MQ回复确认信息，MQ则会将消息从队列中删除，false则需要手动确认
          * 参数3：消费者
          */
-        channel.basicConsume(QUEUE_NAME,true,defaultConsumer);
+        channel.basicConsume(FANOUT_QUEUE_2,true,defaultConsumer);
     }
 }
